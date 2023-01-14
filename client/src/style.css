@@ -1,12 +1,12 @@
 :root {
-  --dark: #1D1D21;
-  --dark-dim: #3C3A42;
+  --dark: #1d1d21;
+  --dark-dim: #3c3a42;
 
-  --light: #EDEEFF;
-  --light-dim: #F8F8FF;
+  --light: #edeeff;
+  --light-dim: #f8f8ff;
 
   --border-dark: #434348;
-  --border-light: #AAAABC;
+  --border-light: #aaaabc;
 
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
   font-size: 16px;
@@ -51,4 +51,5 @@ body {
 
 .canvas {
   border: 1px solid var(--border-color);
+  cursor: pointer;
 }
