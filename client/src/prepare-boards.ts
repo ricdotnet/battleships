@@ -1,7 +1,11 @@
 import { ICell } from './types';
 import { constants } from './constants';
 
-export function prepareBoards(ctx: CanvasRenderingContext2D) {
+interface PrepareBoardsReturn {
+  cells: ICell[];
+}
+
+export function prepareBoards(ctx: CanvasRenderingContext2D): PrepareBoardsReturn {
   const cells: ICell[] = [];
 
   for ( let i = 0; i < constants.BOARD_SIZE; i++ ) {

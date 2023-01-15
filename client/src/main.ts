@@ -1,7 +1,9 @@
+import { websocket } from './websocket';
 import { prepareBoards } from './prepare-boards';
 import { constants } from './constants';
+import { clickEvent } from './events';
+import { Context2D, HTMLCanvas } from './types';
 import './assets/style.css';
-import { clickEvent, opponentAttackEvent } from './events';
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <div>
@@ -10,15 +12,15 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   </div>
 `;
 
-const playerCanvas: HTMLCanvasElement | null = document.querySelector('#player');
-const opponentCanvas: HTMLCanvasElement | null = document.querySelector('#opponent');
+const playerCanvas: HTMLCanvas = document.querySelector('#player');
+const opponentCanvas: HTMLCanvas = document.querySelector('#opponent');
 
 if ( !playerCanvas || !opponentCanvas ) {
   throw new Error('some canvas was not generated');
 }
 
-const playerCtx: CanvasRenderingContext2D | null = playerCanvas.getContext('2d');
-const opponentCtx: CanvasRenderingContext2D | null = opponentCanvas.getContext('2d');
+const playerCtx: Context2D = playerCanvas.getContext('2d');
+const opponentCtx: Context2D = opponentCanvas.getContext('2d');
 
 if ( !playerCtx || !opponentCtx ) {
   throw new Error('some context is not available');
@@ -34,4 +36,5 @@ prepareBoards(playerCtx);
 const opponentBoard = prepareBoards(opponentCtx);
 
 clickEvent(opponentCanvas, opponentCtx, opponentBoard.cells);
-// opponentAttackEvent(playerCtx)({ x: 0, y: 0, sq: 'hi' });
+
+websocket(playerCtx);

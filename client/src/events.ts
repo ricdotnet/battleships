@@ -1,5 +1,6 @@
 import { ICell } from './types';
 import { constants } from './constants';
+import { request } from './request';
 
 export function clickEvent(element: HTMLCanvasElement, ctx: CanvasRenderingContext2D, cells: ICell[]) {
   element.addEventListener('click', (e: MouseEvent) => {
@@ -8,7 +9,10 @@ export function clickEvent(element: HTMLCanvasElement, ctx: CanvasRenderingConte
       ctx.beginPath();
       ctx.fillStyle = 'red';
       ctx.fillRect(cell.x, cell.y, constants.CELL_SIZE, constants.CELL_SIZE);
-      //request(cell);
+
+      // TODO: globalize the username
+      const params = new URLSearchParams(window.location.search);
+      request(cell, params.get('player')!);
     }
   });
 }
@@ -18,7 +22,7 @@ export function opponentAttackEvent(ctx: CanvasRenderingContext2D) {
     ctx.beginPath();
     ctx.fillStyle = 'red';
     ctx.fillRect(play.x, play.y, constants.CELL_SIZE, constants.CELL_SIZE);
-  }
+  };
 }
 
 function findCell(offsetX: number, offsetY: number, cells: ICell[]): ICell | undefined {
