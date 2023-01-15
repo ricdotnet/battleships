@@ -1,7 +1,7 @@
 import { prepareBoards } from './prepare-boards';
-import { ICell } from './types';
 import { constants } from './constants';
 import './assets/style.css';
+import { clickEvent, opponentAttackEvent } from './events';
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <div>
@@ -10,13 +10,19 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   </div>
 `;
 
-const playerCanvas: HTMLCanvasElement | null =
-  document.querySelector('#player');
-const opponentCanvas: HTMLCanvasElement | null =
-  document.querySelector('#opponent');
+const playerCanvas: HTMLCanvasElement | null = document.querySelector('#player');
+const opponentCanvas: HTMLCanvasElement | null = document.querySelector('#opponent');
 
-if ( !playerCanvas || !opponentCanvas )
+if ( !playerCanvas || !opponentCanvas ) {
   throw new Error('some canvas was not generated');
+}
+
+const playerCtx: CanvasRenderingContext2D | null = playerCanvas.getContext('2d');
+const opponentCtx: CanvasRenderingContext2D | null = opponentCanvas.getContext('2d');
+
+if ( !playerCtx || !opponentCtx ) {
+  throw new Error('some context is not available');
+}
 
 playerCanvas.width = constants.CANVAS_SIZE;
 playerCanvas.height = constants.CANVAS_SIZE;
@@ -24,23 +30,8 @@ playerCanvas.height = constants.CANVAS_SIZE;
 opponentCanvas.width = constants.CANVAS_SIZE;
 opponentCanvas.height = constants.CANVAS_SIZE;
 
-prepareBoards(playerCanvas.getContext('2d')!);
-const { cells } = prepareBoards(opponentCanvas.getContext('2d')!);
+prepareBoards(playerCtx);
+const opponentBoard = prepareBoards(opponentCtx);
 
-opponentCanvas.addEventListener('click', (e: MouseEvent) => {
-  const cell: ICell | undefined = cells.find((cell: any) => {
-    return (
-      e.offsetX > cell.x + constants.GAP &&
-      e.offsetX < cell.x + constants.CELL_SIZE + constants.GAP &&
-      e.offsetY > cell.y + constants.GAP &&
-      e.offsetY < cell.y + constants.CELL_SIZE + constants.GAP
-    );
-  });
-  if ( cell ) {
-    const ctx = opponentCanvas.getContext('2d')!;
-    ctx.beginPath();
-    ctx.fillStyle = 'red';
-    ctx.fillRect(cell.x, cell.y, constants.CELL_SIZE, constants.CELL_SIZE);
-    //request(cell);
-  }
-});
+clickEvent(opponentCanvas, opponentCtx, opponentBoard.cells);
+// opponentAttackEvent(playerCtx)({ x: 0, y: 0, sq: 'hi' });
