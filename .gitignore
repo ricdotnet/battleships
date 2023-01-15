@@ -11,6 +11,8 @@
 **/dist
 **/dist-ssr
 **/*.local
+**/yarn.lock
+**/package-log.json
 
 # Editor directories and files
 **/.vscode/*
