@@ -1,1 +1,1 @@
-export function websocket(ctx: CanvasRenderingContext2D) {}
+export function websocket() {}
