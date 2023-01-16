@@ -1,7 +1,6 @@
 import { Request, Response, Router } from 'express';
-import { WebSocket } from 'ws';
 import { getGame } from '../services/games';
-import { IGame } from '../types';
+import { IGame, PlayerState } from '../types';
 
 export const routes = Router();
 
@@ -11,9 +10,9 @@ routes.post('/play', (req: Request, res: Response) => {
 
   if ( !game ) return res.status(404).send({ code: 404, message: 'game not found' });
 
-  game.players.forEach((value: WebSocket, key: string) => {
+  game.players.forEach((value: PlayerState, key: string) => {
     if ( key !== player ) {
-      value.send(JSON.stringify(cell));
+      value.connection.send(JSON.stringify(cell));
     }
   });
 });

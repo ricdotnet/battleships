@@ -49,6 +49,27 @@ body {
   text-align: center;
 }
 
+.boards {
+  position: relative;
+}
+.boards .labels-h {
+  position: absolute;
+  top: -30px;
+  display: flex;
+}
+.boards .labels-v {
+  position: absolute;
+  display: flex;
+  left: -35px;
+  flex-direction: column;
+  top: 5px;
+}
+.boards .item {
+  width: 33px;
+  height: 33px;
+  opacity: 0.3;
+}
+
 .canvas {
   border: 1px solid var(--border-color);
   cursor: pointer;

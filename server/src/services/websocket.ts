@@ -1,6 +1,7 @@
 import { IncomingMessage } from 'http';
 import { RawData, WebSocket, WebSocketServer } from 'ws';
 import { addPlayer } from './games';
+import { IMessage } from '../types';
 
 export function initWebsocketServer() {
   const websocketServer = new WebSocketServer({ port: 4001 });
@@ -19,10 +20,4 @@ function onMessage(connection: WebSocket, rawData: RawData, request: IncomingMes
     addPlayer(data.gameId, data.player, connection);
     connection.send(JSON.stringify({ message: 'connected to the game' }));
   }
-}
-
-interface IMessage {
-  type: 'connection' | 'play';
-  gameId: string;
-  player: string;
 }

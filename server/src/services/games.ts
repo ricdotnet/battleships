@@ -20,5 +20,5 @@ export function addPlayer(id: string, player: string, connection: WebSocket) {
 
   if ( !game ) throw new Error('game not found?');
 
-  game.players.set(player, connection);
+  game.players.set(player, { connection: connection, boats: [] });
 }
