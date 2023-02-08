@@ -12,7 +12,7 @@ export function clickEvent(element: HTMLCanvasElement, ctx: CanvasRenderingConte
 
       // TODO: globalize the username
       const params = new URLSearchParams(window.location.search);
-      request(cell, params.get('player')!);
+      void request(cell, params.get('player')!);
     }
   });
 }
