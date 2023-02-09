@@ -3,8 +3,8 @@ import { prepareBoard, renderBoard } from './prepare-board';
 import { constants } from './constants';
 import { clickEvent } from './events';
 import { Context2D, HTMLCanvas } from './types';
+import { SmallBoat, MediumBoat, LargeBoat } from "./boat";
 import './assets/style.css';
-import { Boat } from "./boat";
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <div class="boards">
@@ -35,11 +35,16 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <canvas id="player" class="canvas"></canvas>
     <canvas id="opponent" class="canvas"></canvas>
   </div>
-  <div>my boats here</div>
+  <button type="button" id="play">Play</button>
 `;
 
 const playerCanvas: HTMLCanvas = document.querySelector('#player');
 const opponentCanvas: HTMLCanvas = document.querySelector('#opponent');
+const playButton: HTMLButtonElement | null = document.querySelector('#play');
+
+playButton?.addEventListener('click', () => {
+  canPlace = false;
+});
 
 if (!playerCanvas || !opponentCanvas) {
   throw new Error('some canvas was not generated');
@@ -65,10 +70,13 @@ clickEvent(opponentCanvas, opponentCtx, cells);
 renderBoard(playerCtx, cells);
 renderBoard(opponentCtx, cells);
 
-const boats: Boat[] = [];
-boats.push(new Boat(0, 0, playerCtx));
-boats.push(new Boat(0, 0, playerCtx));
-boats.push(new Boat(0, 0, playerCtx));
+const boats: any[] = [];
+boats.push(new LargeBoat(0, 0, 'hor', playerCtx));
+boats.push(new LargeBoat(0, 0, 'ver', playerCtx));
+boats.push(new MediumBoat(0, 0, 'hor', playerCtx));
+boats.push(new MediumBoat(0, 0, 'ver', playerCtx));
+boats.push(new SmallBoat(0, 0, 'hor', playerCtx));
+boats.push(new SmallBoat(0, 0, 'hor', playerCtx));
 
 function render() {
   playerCtx!.clearRect(0, 0, constants.BOARD_SIZE, constants.CANVAS_SIZE);
@@ -82,14 +90,12 @@ function render() {
 
 render();
 
-let boat: Boat | undefined = undefined;
+// TODO: Extract this
+let canPlace = true;
+let boat: any = undefined;
 playerCanvas.addEventListener('mousedown', (e: MouseEvent) => {
-  boats.forEach((b: Boat) => {
-    if (b.x < e.offsetX && e.offsetX < b.x + b.resolveSize()
-      && b.y < e.offsetY && e.offsetY < b.y + constants.CELL_SIZE && !boat) {
-      boat = b;
-    }
-  });
+  if (!canPlace) return;
+  boat = findBoat(e.offsetX, e.offsetY);
 });
 
 playerCanvas.addEventListener('mouseup', () => {
@@ -105,3 +111,17 @@ playerCanvas.addEventListener('mousemove', (e: MouseEvent) => {
     render();
   }
 });
+
+function findBoat(offsetX: number, offsetY: number) {
+  let boat: any = undefined;
+  for (let i = boats.length - 1; i >= 0; i--) {
+    if (boats[i].x < offsetX && offsetX < boats[i].x + (boats[i].ori === 'hor' ? boats[i].resolveSize() : constants.CELL_SIZE)
+      && boats[i].y < offsetY && offsetY < boats[i].y + (boats[i].ori === 'ver' ? boats[i].resolveSize() : constants.CELL_SIZE)
+      && !boat) {
+      boat = boats[i];
+      break;
+    }
+  }
+
+  return boat;
+}
