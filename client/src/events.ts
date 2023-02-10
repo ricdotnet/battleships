@@ -3,7 +3,7 @@ import { constants } from './constants';
 import { request } from './request';
 
 export function clickEvent(element: HTMLCanvasElement, ctx: CanvasRenderingContext2D, cells: ICell[]) {
-  element.addEventListener('click', (e: MouseEvent) => {
+  element.addEventListener('click', async (e: MouseEvent) => {
     const cell: ICell | undefined = findCell(e.offsetX, e.offsetY, cells);
     if ( cell ) {
       ctx.beginPath();
@@ -12,16 +12,21 @@ export function clickEvent(element: HTMLCanvasElement, ctx: CanvasRenderingConte
 
       // TODO: globalize the username
       const params = new URLSearchParams(window.location.search);
-      void request(cell, params.get('player')!);
+      const payload = {
+        gameId: params.get('id'),
+        player: params.get('username'),
+        cell: cell,
+      }
+      await request('/hit', payload, 'POST');
     }
   });
 }
 
 export function opponentAttackEvent(ctx: CanvasRenderingContext2D) {
-  return function (play: ICell) {
+  return function (play: any) {
     ctx.beginPath();
-    ctx.fillStyle = 'red';
-    ctx.fillRect(play.x, play.y, constants.CELL_SIZE, constants.CELL_SIZE);
+    ctx.fillStyle = (play.hit) ? 'green' : 'red';
+    ctx.fillRect(play.cell.x, play.cell.y, constants.CELL_SIZE, constants.CELL_SIZE);
   };
 }
 

@@ -1,5 +1,4 @@
 import { opponentAttackEvent } from './events';
-import { ICell } from './types';
 
 export let connection: WebSocket;
 
@@ -8,6 +7,8 @@ export function websocket(ctx: CanvasRenderingContext2D) {
 
   connection.onopen = onOpen;
   connection.onmessage = (event: MessageEvent) => onMessage(event, ctx);
+  connection.onerror = (event: Event) => onError(event);
+  connection.onclose = (event: CloseEvent) => onClose(event);
 }
 
 // TODO: refactor this garbage
@@ -16,12 +17,22 @@ function onOpen() {
   const params = new URLSearchParams(window.location.search);
   connection.send(JSON.stringify({
     type: 'connection',
-    gameId: 'game1',
-    player: params.get('player'),
+    gameId: params.get('id'),
+    player: params.get('username'),
   }));
 }
 
 function onMessage(event: MessageEvent, ctx: CanvasRenderingContext2D) {
-  const play: ICell = JSON.parse(event.data);
-  opponentAttackEvent(ctx)(play);
+  const play: any = JSON.parse(event.data);
+  if (play.type === 'hit') {
+    opponentAttackEvent(ctx)(play);
+  }
+}
+
+function onClose(event: CloseEvent) {
+  // reconnect maybe?
+}
+
+function onError(event: Event) {
+  // reconnect?
 }

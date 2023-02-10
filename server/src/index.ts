@@ -15,5 +15,5 @@ app.listen(4000, () => {
   console.log('server on and listening on:', 4000);
 
   // create a test game
-  createGame();
+  // createGame();
 });
