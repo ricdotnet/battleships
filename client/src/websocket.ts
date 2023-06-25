@@ -29,10 +29,12 @@ function onMessage(event: MessageEvent, ctx: CanvasRenderingContext2D) {
   }
 }
 
+// @ts-expect-error
 function onClose(event: CloseEvent) {
   // reconnect maybe?
 }
 
+// @ts-expect-error
 function onError(event: Event) {
   // reconnect?
 }

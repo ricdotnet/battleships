@@ -49,7 +49,7 @@ routes.post('/play', (req: Request, res: Response) => {
 routes.post('/hit', (req: Request, res: Response) => {
   const { gameId, player, cell } = req.body;
 
-  hit(+gameId, player, cell);
+  const _hit = hit(+gameId, player, cell);
 
-  res.send();
+  res.send({ hit: _hit });
 });

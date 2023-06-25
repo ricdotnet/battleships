@@ -4,10 +4,11 @@ import { game } from './game';
 
 const route = routes[location.pathname as Routes];
 
-if (route === 'home') {
-  home();
-}
-
-if (route === 'game') {
-  game();
+switch (route) {
+  case 'home':
+    home();
+    break;
+  case 'game':
+    game();
+    break;
 }

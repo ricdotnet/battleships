@@ -5,7 +5,6 @@ interface PrepareBoardsReturn {
   cells: ICell[];
 }
 
-
 export function prepareBoard(): PrepareBoardsReturn {
   const cells: ICell[] = [];
 

@@ -1,9 +1,9 @@
 import { WebSocket } from 'ws';
-import { IGame, PlayerState, Username, Boat } from '../types';
+import { Boat, IGame, PlayerState, Username } from '../types';
 
 const games: IGame[] = [];
 
-export function createGame(gameId: string, player: Username): Promise<string> {
+export function createGame(gameId: string, player: Username): Promise<void> {
   const game: IGame | undefined = games.find(g => +g.id === +gameId);
 
   if (game) {
@@ -11,8 +11,7 @@ export function createGame(gameId: string, player: Username): Promise<string> {
       connection: null,
       boats: [],
     });
-    console.log(game);
-    return Promise.resolve('game joined');
+    return Promise.resolve();
   }
 
   const players: Map<Username, PlayerState> = new Map();
@@ -23,7 +22,7 @@ export function createGame(gameId: string, player: Username): Promise<string> {
 
   games.push({ id: gameId, players: players });
 
-  return Promise.resolve('game created');
+  return Promise.resolve();
 }
 
 export function getGame(id: number): IGame | undefined {
@@ -37,26 +36,33 @@ const sizes = {
   'large': 5,
 }
 
-export function hit(id: number, username: Username, cell: any): void {
+export function hit(id: number, username: Username, cell: any): boolean {
   const game = getGame(id);
 
-  let oppo: any;
-  game!.players.forEach((p: PlayerState, key: Username) => {
-    if (key !== username) oppo = p;
-  });
   let hit = false;
-  oppo!.boats.forEach((boat: Boat) => {
-    if (boat.xPos === cell.x * sizes[boat.type] && boat.yPos === cell.y * sizes[boat.type]) {
-      hit = true;
+  game!.players.forEach((player, key) => {
+    if (key !== username) {
+      player.boats.forEach((boat: Boat) => {
+        if (boat.orientation === 'hor' && cell.x >= boat.xPos && cell.x < boat.xPos + (30 * sizes[boat.type])
+          && boat.yPos === cell.y) {
+          hit = true;
+        }
+
+        if (boat.orientation === 'ver' && boat.xPos === cell.x
+          && (cell.y >= boat.yPos && cell.y < boat.yPos + (30 * sizes[boat.type]))) {
+          hit = true;
+        }
+      });
+      player.connection?.send(JSON.stringify({ type: 'hit', hit: hit, cell: cell }));
     }
   });
-  oppo!.connection!.send(JSON.stringify({ type: 'hit', hit: hit, cell: cell }));
+  return hit;
 }
 
 export function addPlayer(id: string, username: Username, connection: WebSocket) {
   const game: IGame | undefined = getGame(+id);
 
-  if ( !game ) throw new Error('game does not exist');
+  if (!game) throw new Error('game does not exist');
 
   const player: PlayerState | undefined = game.players.get(username);
   player!.connection = connection;

@@ -1,15 +1,16 @@
 import { ICell } from './types';
 import { constants } from './constants';
 import { request } from './request';
+import { GameStore } from "./game-store";
 
 export function clickEvent(element: HTMLCanvasElement, ctx: CanvasRenderingContext2D, cells: ICell[]) {
   element.addEventListener('click', async (e: MouseEvent) => {
     const cell: ICell | undefined = findCell(e.offsetX, e.offsetY, cells);
-    if ( cell ) {
-      ctx.beginPath();
-      ctx.fillStyle = 'red';
-      ctx.fillRect(cell.x, cell.y, constants.CELL_SIZE, constants.CELL_SIZE);
 
+    const gameStore = GameStore.getStore();
+    console.log('current turn', gameStore?.getCurrentTurn());
+
+    if ( cell && gameStore?.getCurrentTurn() === 'player' ) {
       // TODO: globalize the username
       const params = new URLSearchParams(window.location.search);
       const payload = {
@@ -17,16 +18,26 @@ export function clickEvent(element: HTMLCanvasElement, ctx: CanvasRenderingConte
         player: params.get('username'),
         cell: cell,
       }
-      await request('/hit', payload, 'POST');
+      const response = await request('/hit', payload, 'POST');
+      const { hit } = await response.json();
+
+      ctx.beginPath();
+      ctx.fillStyle = hit ? 'green' : 'red';
+      ctx.fillRect(cell.x + 10, cell.y + 10, constants.CELL_SIZE - 20, constants.CELL_SIZE - 20);
+
+      gameStore.setCurrentTurn('opponent');
     }
   });
 }
 
 export function opponentAttackEvent(ctx: CanvasRenderingContext2D) {
   return function (play: any) {
+
+    GameStore.getStore()?.setCurrentTurn('player');
+
     ctx.beginPath();
     ctx.fillStyle = (play.hit) ? 'green' : 'red';
-    ctx.fillRect(play.cell.x, play.cell.y, constants.CELL_SIZE, constants.CELL_SIZE);
+    ctx.fillRect(play.cell.x + 10, play.cell.y + 10, constants.CELL_SIZE - 20, constants.CELL_SIZE - 20);
   };
 }
 

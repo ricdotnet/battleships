@@ -3,7 +3,7 @@ import { prepareBoard, renderBoard } from './prepare-board';
 import { constants } from './constants';
 import { clickEvent } from './events';
 import { Context2D, HTMLCanvas } from './types';
-import { SmallBoat, MediumBoat, LargeBoat } from "./boat";
+import { LargeBoat, MediumBoat, SmallBoat } from "./boat";
 import './assets/style.css';
 import { request } from './request';
 
